@@ -17,8 +17,8 @@ const vertCode = `attribute vec3 coordinates;
                 }`;
 
 const fragCode = `precision mediump float;
-                varying vec3 vColor;
-                void main(void) {
+                    varying vec3 vColor;
+                    void main(void) {
                     gl_FragColor = vec4(vColor, 1.);
                 }`;
 
@@ -31,9 +31,9 @@ function render(gl, listObj) {
 
     ////////////////////// store to buffer ///////////////
     // Create an empty buffer object and store data
-    var Index_Buffer = initBuffer(gl, "int", indices) 
-    var vertex_buffer = initBuffer(gl, "float", vertices)
-    var color_buffer = initBuffer(gl, "float", colors)
+    var Index_Buffer = initBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices)); 
+    var vertex_buffer = initBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(vertices));
+    var color_buffer = initBuffer(gl, gl.ARRAY_BUFFER, new Float32Array(colors));
     
     ////////////////////// shader //////////////////////
     var shaderProgram = initShader(gl)
@@ -83,19 +83,13 @@ function appendAllVerticesIndicesColors(listObj) {
     return [vertices, indices, colors]
 }
 
-function initBuffer(gl, dataType, dataToStore) {
+function initBuffer(gl, type, dataToStore) {
     var buffer = gl.createBuffer();
-    if (dataType=="int"){
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(dataToStore), gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
-    }
-    else { //float
-        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(dataToStore), gl.STATIC_DRAW);
-        gl.bindBuffer(gl.ARRAY_BUFFER, null);
-    }
-    
+
+    gl.bindBuffer(type, buffer);
+    gl.bufferData(type, dataToStore, gl.STATIC_DRAW);
+    gl.bindBuffer(type, null);
+
     return buffer;
 }
 
