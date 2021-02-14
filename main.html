@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+   <script type="text/javascript" src="common.js"></script>
+   <script type="text/javascript" src="script.js" defer></script>
+</head>
+<body>
+   <canvas width = "1024" height = "570" id = "my_Canvas"></canvas>
+   <br> <br>
+   <select id="input_menu">
+      <option value="drawing">drawing</option>
+   </select>
+
+   <select id="input_jenis">
+      <option value="polygon">Polygon</option>
+      <!-- <option value="square">Square</option>
+      <option value="line">Line</option> -->
+   </select>
+
+   <select id="input_color">
+      <option value="black">Black</option>
+      <option value="red">Red</option>
+      <option value="yellow">Yellow</option>
+      <option value="green">Green</option>
+      <option value="blue">Blue</option>
+      <option value="magenta">Magenta</option>
+      <option value="cyan">Cyan</option>
+   </select>
+   
+   <label for="input_jumlahSisi">Jumlah sisi:</label>
+   <input type="text" id="input_jumlahSisi" name="input_jumlahSisi" value="4">
+
+   <button onclick="processInput()"> Change Mode</button>   
+
+   <p>kalau mau gambar polygon, klick di canvas sejumlah "jumlah sisi"</p>
+   <p>kalau mau ubah pilihan, setelah diubah -> klik change mode</p>
+   <p>untuk polygon, jumlah sisi minimal 3</p>
+</body>
+</html>
