@@ -1,4 +1,4 @@
-const dictColorVectors =  {
+const dictColorVectors = {
     "black": [0.0, 0.0, 0.0],
     "red": [1.0, 0.0, 0.0],
     "yellow": [1.0, 1.0, 0.0],
@@ -6,7 +6,7 @@ const dictColorVectors =  {
     "blue": [0.0, 0.0, 1.0],
     "magenta": [1.0, 0.0, 1.0],
     "cyan": [0.0, 1.0, 1.0],
-  }
+}
 
 function render(gl, listObj) {
     ////////////////// append all /////////////////////
@@ -29,10 +29,10 @@ function render(gl, listObj) {
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
     // Create an empty buffer object and store color data
-    var color_buffer = gl.createBuffer ();
+    var color_buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colors), gl.STATIC_DRAW);
-    
+
     ////////////////////// shader //////////////////////
     // vertex shader
     var vertCode = `attribute vec3 coordinates;
@@ -53,7 +53,7 @@ function render(gl, listObj) {
                     void main(void) {
                         gl_FragColor = vec4(vColor, 1.);
                     }`;
-       
+
 
     var fragShader = gl.createShader(gl.FRAGMENT_SHADER);
     gl.shaderSource(fragShader, fragCode);
@@ -81,7 +81,7 @@ function render(gl, listObj) {
     // send attribute coolor
     gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
     var color = gl.getAttribLocation(shaderProgram, "color");
-    gl.vertexAttribPointer(color, 3, gl.FLOAT, false,0,0) ;
+    gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(color);
 
     /////////////////////// draw /////////////////////////////
@@ -93,35 +93,35 @@ function appendAllVerticesIndicesColors(listObj) {
     indices = []
     colors = []
 
-    for (var i = 0; i<listObj.length; ++i){ 
+    for (var i = 0; i < listObj.length; ++i) {
         vertices = vertices.concat(listObj[i].vertices);
 
         var currColors = []
-        for (var j = 0; j<listObj[i].jumlahSisi; ++j){
+        for (var j = 0; j < listObj[i].jumlahSisi; ++j) {
             currColors = currColors.concat(dictColorVectors[listObj[i].color]);
         }
-    
+
         colors = colors.concat(currColors);
 
         lastIdx = indices.length;
-        for (var j = 0; j<listObj[i].jumlahSisi; ++j){
+        for (var j = 0; j < listObj[i].jumlahSisi; ++j) {
             indices.push(j + lastIdx);
         }
     }
     return [vertices, indices, colors]
 }
 
-function drawAll(gl, listObj){
+function drawAll(gl, listObj) {
     gl.enable(gl.DEPTH_TEST);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
     console.log(listObj);
     var offset = 0;
-    for (var i = 0; i<listObj.length; ++i){
+    for (var i = 0; i < listObj.length; ++i) {
         var jumlahSisi = listObj[i].jumlahSisi;
-        if (listObj[i].jenis=="polygon"){
-            gl.drawElements(gl.TRIANGLE_FAN, jumlahSisi, gl.UNSIGNED_SHORT, 2*offset);
+        if (listObj[i].jenis == "polygon" || listObj[i].jenis == "square") {
+            gl.drawElements(gl.TRIANGLE_FAN, jumlahSisi, gl.UNSIGNED_SHORT, 2 * offset);
         }
         offset += jumlahSisi;
-    }   
+    }
 }
