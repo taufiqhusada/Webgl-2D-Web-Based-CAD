@@ -30,7 +30,15 @@ function processInput(){
     menu = input_menu.value;
 }
 
+function processDataFromFile(){
+    console.log(data);
+    for (var i = 0; i<data.length; ++i){
+        listObj.push(new Obj(data[i].jenis, data[i].jumlahSisi, data[i].vertices, data[i].color));
+    }
+}
+
 window.onload = function init(){
+    processDataFromFile();
     processInput();
    
     var canvas = document.getElementById('my_Canvas');
@@ -40,13 +48,15 @@ window.onload = function init(){
     gl.enable(gl.DEPTH_TEST);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.viewport(0,0,canvas.width,canvas.height);
+    
+    render(gl, listObj); 
 
     canvas.addEventListener("mousedown", function(event){
         if (menu=="drawing"){
             if (cntMouseClicked == jumlahSisi -1 ){
                 currVertices.push(2 * event.clientX / canvas.width - 1, 2 * (canvas.height - event.clientY) / canvas.height - 1, 0.0);
     
-                listObj.push(new Obj(jenis, jumlahSisi, currVertices, [currColor]));
+                listObj.push(new Obj(jenis, jumlahSisi, currVertices, currColor));
     
                 // fungsi ada di common.js
                 render(gl, listObj); 
@@ -61,3 +71,4 @@ window.onload = function init(){
         } 
     });
 }
+
