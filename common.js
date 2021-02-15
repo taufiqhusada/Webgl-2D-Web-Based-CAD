@@ -46,15 +46,11 @@ function render(gl, listObj) {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Index_Buffer);
 
     // send attribute coordinate
-    var coord = gl.getAttribLocation(shaderProgram, "coordinates");
-    gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(coord);
+    sendAttrToShader(shaderProgram, "coordinates", 3);
 
     // send attribute coolor
     gl.bindBuffer(gl.ARRAY_BUFFER, color_buffer);
-    var color = gl.getAttribLocation(shaderProgram, "color");
-    gl.vertexAttribPointer(color, 3, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(color);
+    sendAttrToShader(shaderProgram, "color", 3);
 
     /////////////////////// draw /////////////////////////////
     drawAll(gl, listObj);
@@ -114,6 +110,11 @@ function loadShader(gl, type, code) {
     return shader;
 }
 
+function sendAttrToShader(shaderProgram, variableName, size){
+    var attrLoc = gl.getAttribLocation(shaderProgram, variableName);
+    gl.vertexAttribPointer(attrLoc, size, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(attrLoc);
+}
 
 function drawAll(gl, listObj) {
     gl.enable(gl.DEPTH_TEST);

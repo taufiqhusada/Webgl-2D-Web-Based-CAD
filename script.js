@@ -89,6 +89,34 @@ window.onload = function init() {
                 currVertices.push(2 * event.clientX / canvas.width - 1, 2 * (canvas.height - event.clientY) / canvas.height - 1, 0.0);
             }
         }
+        else if (menu=="change-color") {
+            changeColor(canvas, listObj);
+            render(gl, listObj);
+        }
     });
 }
 
+function changeColor(canvas, listObj){
+    let x = 2 * event.clientX / canvas.width - 1;
+    let y = 2 * (canvas.height - event.clientY) / canvas.height - 1;
+
+    let idxNearestObj = findNearestObj(listObj, x, y); 
+    listObj[idxNearestObj].color = currColor;
+}
+
+function findNearestObj(listObj, x, y){
+    let nearestDistance = Number.MAX_SAFE_INTEGER;
+    let idxNearestObj = -1;
+    for (var i = 0; i<listObj.length; ++i){
+        let obj = listObj[i];
+        for (var j = 0; j<obj.jumlahSisi; j+=3){
+            // calculate distance
+            let dist = Math.pow(Math.pow(obj.vertices[j] - x, 2) + Math.pow(obj.vertices[j+1] - y, 2), 0.5);
+            if (dist < nearestDistance) {
+                nearestDistance = dist;
+                idxNearestObj = i;
+            }
+        }
+    }
+    return idxNearestObj;
+}
