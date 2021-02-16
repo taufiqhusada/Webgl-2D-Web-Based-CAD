@@ -11,7 +11,7 @@ var listObj = [];
 
 var currVertices = [];
 var currColor;
-var selectedSquare; // buat ngubah size square
+var idxSelectedSquare = -1; // buat ngubah size square
 
 var jenis;
 var jumlahSisi;
@@ -51,7 +51,7 @@ function selectSquare(x, y) {
             let temp = obj.vertices;
             let x0 = temp[0], y0 = temp[1],
                 x1 = temp[6], y1 = temp[7];
-            console.log(x0+","+x1+"  "+y0+","+y1);
+            console.log(x0 + "," + x1 + "  " + y0 + "," + y1);
 
             if (x >= Math.min(x1, x0) && x <= Math.max(x1, x0)
                 && y >= Math.min(y1, y0) && y <= Math.max(y1, y0)) {
@@ -130,16 +130,14 @@ window.onload = function init() {
                 currVertices.push(pos.x, pos.y, 0.0);
             }
         } else if (menu == "change-size") {
-            // Pilih satu rectangle mau diubah
+            // Finds the nearest square
             let pos = getCursorPosition(event, canvas);
-            let idx = selectSquare(pos.x, pos.y);
-            console.log(idx);
-            if(idx > -1) {
-                slider.disabled = false;
-                selectedSquare = listObj[idx];
+            idxSelectedSquare = selectSquare(pos.x, pos.y);
+            if (idxSelectedSquare > -1) {
+                slider.disabled = false; // Enables the slider menu
             }
         }
-        else if (menu=="change-color") {
+        else if (menu == "change-color") {
             let pos = getCursorPosition(event, canvas);
             changeColor(canvas, pos, listObj);
             render(gl, listObj);
@@ -160,18 +158,17 @@ function getCursorPosition(event, canvas) {
 }
 
 function resize() {
-    // Change a square size everytime the slider is moved
-
-    let idx = listObj.indexOf(selectedSquare); // cari index
-    let ratio = document.getElementById("new-size").value/100;
+    // Updates the size of a square each time the slider adjusted
+    // Pre-condiiton: idxSelectedSquare > -1
+    let ratio = document.getElementById("new-size").value / 100;
 
     // Cari titik dua diagonal square
-    let vertices = selectedSquare.vertices;
+    let vertices = listObj[idxSelectedSquare].vertices;
     let x0 = vertices[0], y0 = vertices[1],
         x1 = vertices[6], y1 = vertices[7];
 
-    listObj[idx].vertices = [];
-    listObj[idx].vertices.push(
+    listObj[idxSelectedSquare].vertices = [];
+    listObj[idxSelectedSquare].vertices.push(
         x0, y0, 0.0,
         x0, y0 + ratio * (y1 - y0), 0.0,
         x0 + ratio * (x1 - x0), y0 + ratio * (y1 - y0), 0.0,
@@ -179,22 +176,23 @@ function resize() {
     )
 
     render(gl, listObj);
+    document.getElementById("new-size").value = 100; // Returns slider position to default
     document.getElementById("new-size").disabled = true;
 }
 
-function changeColor(canvas, pos, listObj){
+function changeColor(canvas, pos, listObj) {
     let idxNearestObj = findNearestObj(listObj, pos.x, pos.y);
     listObj[idxNearestObj].color = currColor;
 }
 
-function findNearestObj(listObj, x, y){
+function findNearestObj(listObj, x, y) {
     let nearestDistance = Number.MAX_SAFE_INTEGER;
     let idxNearestObj = -1;
-    for (var i = 0; i<listObj.length; ++i){
+    for (var i = 0; i < listObj.length; ++i) {
         let obj = listObj[i];
-        for (var j = 0; j<obj.jumlahSisi; j+=3){
+        for (var j = 0; j < obj.jumlahSisi; j += 3) {
             // calculate distance
-            let dist = Math.pow(Math.pow(obj.vertices[j] - x, 2) + Math.pow(obj.vertices[j+1] - y, 2), 0.5);
+            let dist = Math.pow(Math.pow(obj.vertices[j] - x, 2) + Math.pow(obj.vertices[j + 1] - y, 2), 0.5);
             if (dist < nearestDistance) {
                 nearestDistance = dist;
                 idxNearestObj = i;
@@ -202,5 +200,4 @@ function findNearestObj(listObj, x, y){
         }
     }
     return idxNearestObj;
-
 }
