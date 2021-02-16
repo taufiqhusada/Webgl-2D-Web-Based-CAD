@@ -11,7 +11,7 @@
    <select id="input_menu">
       <option value="drawing">drawing</option>
       <option value="change-size">change size</option>
-      <!-- <option value="change-color">change color</option> -->
+      <option value="change-color">change color</option>
    </select>
 
    <select id="input_jenis">
@@ -29,17 +29,17 @@
       <option value="magenta">magenta</option>
       <option value="cyan">cyan</option>
    </select>
-   
+
    <label for="input_jumlahSisi">Jumlah sisi:</label>
    <input type="text" id="input_jumlahSisi" name="input_jumlahSisi" value="4">
 
    <label for="new-size">Ubah ukuran</label>
    <input type="range" id="new-size" name="new-size" min="50" max="150" onchange="resize()" disabled>
 
-   <button onclick="processInput()"> Change Mode</button>   
+   <button onclick="processInput()"> Change Mode</button>
 
    <p>kalau mau gambar polygon, klick di canvas sejumlah "jumlah sisi"</p>
    <p>kalau mau ubah pilihan, setelah diubah -> klik change mode</p>
-   <p>untuk polygon, jumlah sisi minimal 3</p>
+
 </body>
 </html>
