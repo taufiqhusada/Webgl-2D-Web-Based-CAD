@@ -25,9 +25,9 @@ const fragCode = `precision mediump float;
 function render(gl, listObj) {
     ////////////////// append all /////////////////////
     [vertices, indices, colors] = appendAllVerticesIndicesColors(listObj);
-    console.log(vertices);
-    console.log(indices);
-    console.log(colors);
+    //console.log(vertices);
+    //console.log(indices);
+    //console.log(colors);
 
     ////////////////////// store to buffer ///////////////
     // Create an empty buffer object and store data
