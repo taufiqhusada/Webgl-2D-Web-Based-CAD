@@ -31,5 +31,14 @@ data = [
             -0.3,0.0,0.0 
         ],
         "color": "yellow"
+    },
+    {
+        "jenis": "line",
+        "jumlahSisi": 2,
+        "vertices": [
+            -0.8, -0.3, 0.0,
+            -0.7, 0.3, 0.0
+        ],
+        "color": "blue"
     }
 ];

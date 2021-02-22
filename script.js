@@ -83,6 +83,7 @@ window.onload = function init() {
     canvas.addEventListener("mousedown", function (event) {
         if (menu == "drawing") {// Handle input buat drawing
             if (jenis === "square") { jumlahSisi = 4; }
+            if (jenis === "lines") { jumlahSisi = 2; }
 
             if (cntMouseClicked == jumlahSisi - 1 || (jenis === "square" && cntMouseClicked == 1)) {
 

@@ -127,6 +127,9 @@ function drawAll(gl, listObj) {
         if (listObj[i].jenis == "polygon" || listObj[i].jenis == "square") {
             gl.drawElements(gl.TRIANGLE_FAN, jumlahSisi, gl.UNSIGNED_SHORT, 2 * offset);
         }
+        else if (listObj[i].jenis == "line") {
+            gl.drawElements(gl.LINES, jumlahSisi, gl.UNSIGNED_SHORT, 2 * offset);
+        }
         offset += jumlahSisi;
     }
 }
