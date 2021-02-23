@@ -4,8 +4,11 @@
    <script type="text/javascript" src="common.js"></script>
    <script type="text/javascript" src="data.js"></script>
    <script type="text/javascript" src="script.js" defer></script>
+   <link href="style.css" rel="stylesheet">
 </head>
 <body>
+   <h1>2D Web Based CAD</h1>
+
    <canvas width = "1024" height = "570" id = "my_Canvas"></canvas>
    <br> <br>
    <select id="input_menu">
@@ -34,13 +37,17 @@
    <label for="input_jumlahSisi">Jumlah sisi:</label>
    <input type="text" id="input_jumlahSisi" name="input_jumlahSisi" value="4">
 
-   <label for="new-size">Ubah ukuran</label>
-   <input type="range" id="new-size" name="new-size" min="50" max="150" onchange="resize()" disabled>
+   <div style="margin-top: 10px; margin-bottom: 20px;">
+      <label for="new-size">Ubah ukuran</label>
+      <input type="range" id="new-size" name="new-size" min="50" max="150" onchange="resize()" disabled>
+   </div>
+
+   <div id="polyDetected" style="font-size: 14px;"></div>
 
    <button onclick="processInput()"> Change Mode</button>
 
-   <p>kalau mau gambar polygon, klick di canvas sejumlah "jumlah sisi"</p>
-   <p>kalau mau ubah pilihan, setelah diubah -> klik change mode</p>
+   <button input="button" onclick="displayHelp()">Help</button>
+   <div id="help"> </div>
 
 </body>
 </html>

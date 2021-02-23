@@ -11,7 +11,7 @@ var listObj = [];
 
 var currVertices = [];
 var currColor;
-var idxSelectedSquare = -1; // buat ngubah size square
+var idxSelected = -1; // buat ngubah size square
 
 var jenis;
 var jumlahSisi;
@@ -20,6 +20,7 @@ var menu;
 const origin_x = 512, origin_y = 285;
 
 function processInput() {
+    // Reads input
     var input_jenis = document.getElementById("input_jenis");
     jenis = input_jenis.value;
 
@@ -32,11 +33,24 @@ function processInput() {
     var input_menu = document.getElementById("input_menu");
     menu = input_menu.value;
 
-    document.getElementById("new-size").disabled = true;
+    document.getElementById("new-size").disabled = true; // disable slider
+    
+    if (jenis == "square") { // set jumlah sisi to 4 
+        input_jumlahSisi.value = 4;
+        jumlahSisi = 4;
+    } else if (jenis == "line") { // set jumlah sisi to 1
+        input_jumlahSisi.value = 1;
+        jumlahSisi = 2;
+    } else if (menu == "change-size") {
+        if (jenis == "polygon") {
+            jenis = "square";
+            input_jenis.value = "square";
+        }
+    }
 }
 
 function processDataFromFile() {
-    // console.log(data);
+    // Reads a file from data.js
     for (var i = 0; i < data.length; ++i) {
         listObj.push(new Obj(data[i].jenis, data[i].jumlahSisi, data[i].vertices, data[i].color));
     }
@@ -75,7 +89,7 @@ window.onload = function init() {
 
     gl = canvas.getContext('webgl');
 
-    gl.clearColor(0.5, 0.5, 0.5, 0.9);
+    gl.clearColor(0.95, 0.90, 0.85, 0.9);
     gl.enable(gl.DEPTH_TEST);
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.viewport(0, 0, canvas.width, canvas.height);
@@ -84,8 +98,6 @@ window.onload = function init() {
 
     canvas.addEventListener("mousedown", function (event) {
         if (menu == "drawing") {// Handle input buat drawing
-            if (jenis === "square") { jumlahSisi = 4; }
-            if (jenis === "lines") { jumlahSisi = 2; }
 
             if (cntMouseClicked == jumlahSisi - 1 || (jenis === "square" && cntMouseClicked == 1)) {
 
@@ -133,11 +145,15 @@ window.onload = function init() {
                 currVertices.push(pos.x, pos.y, 0.0);
             }
         } else if (menu == "change-size") {
-            // Finds the nearest square
+            // Finds the nearest square or line
             let pos = getCursorPosition(event, canvas);
-            idxSelectedSquare = selectSquare(pos.x, pos.y);
-            if (idxSelectedSquare > -1) {
+            let errMsg = document.getElementById("polyDetected");
+            idxSelected = findNearestObj(listObj, pos.x, pos.y);
+            if (listObj[idxSelected].jenis == "polygon") {
+                errMsg.innerHTML = "Please select square or line";
+            } else {
                 slider.disabled = false; // Enables the slider menu
+                errMsg.innerHTML = "";
             }
         }
         else if (menu == "change-color") {
@@ -147,8 +163,8 @@ window.onload = function init() {
             clicked = false;
         }
         else if (menu == "move-point") {
-            
-            if(clicked) {
+
+            if (clicked) {
                 let pos = getCursorPosition(event, canvas);
                 listObj[selectedObjIdx].vertices[nearestIdx] = pos.x;
                 listObj[selectedObjIdx].vertices[nearestIdx + 1] = pos.y;
@@ -161,34 +177,37 @@ window.onload = function init() {
                 let vert = listObj[idx].vertices;
                 selectedObjIdx = idx;
                 let minDist = 2;
-                
-                for(let i = 0; i < vert.length; i+=3) {
-                    let tempDist = Math.min(minDist, eucDist(vert[i], vert[i+1], pos));
+
+                for (let i = 0; i < vert.length; i += 3) {
+                    let tempDist = Math.min(minDist, eucDist(vert[i], vert[i + 1], pos));
                     if (minDist > tempDist) {
-                        minDist = Math.min(minDist, eucDist(vert[i], vert[i+1], pos));
+                        minDist = Math.min(minDist, eucDist(vert[i], vert[i + 1], pos));
                         nearestIdx = i;
                     }
                 }
 
                 clicked = true;
             }
-            
+
         }
     });
 
-    canvas.addEventListener('mousemove', function(event) {
-        if(clicked) {
+    canvas.addEventListener('mousemove', function (event) {
+        
+        if (clicked) {
+
+            // Cursor position
             let pos = getCursorPosition(event, canvas);
             listObj[selectedObjIdx].vertices[nearestIdx] = pos.x;
             listObj[selectedObjIdx].vertices[nearestIdx + 1] = pos.y;
 
             if (listObj[selectedObjIdx].jenis == "square") {
-                // nearestIdx can only be: 0, 3, 6, 9
-                let vert = listObj[selectedObjIdx].vertices;
-                switch(nearestIdx) {
+                // Special case : square could be only transformed to a rectangular form
+                let vert = listObj[selectedObjIdx].vertices; // nearestIdx can only be the following values : 0, 3, 6, 9
+                switch (nearestIdx) {
                     case 0:
                         vert[3] = pos.x; vert[4] = vert[7];
-                        vert[9] = vert[6]; vert[10] = pos.y; 
+                        vert[9] = vert[6]; vert[10] = pos.y;
                         break;
                     case 3:
                         console.log(3);
@@ -197,7 +216,7 @@ window.onload = function init() {
                         break;
                     case 6:
                         vert[3] = pos.x; vert[4] = vert[1];
-                        vert[9] = vert[0]; vert[10] = pos.y; 
+                        vert[9] = vert[0]; vert[10] = pos.y;
                         break;
                     case 9:
                         console.log(9);
@@ -212,7 +231,7 @@ window.onload = function init() {
 }
 
 function getCursorPosition(event, canvas) {
-
+    // Returns cursor position relative to the WebGL Canvas
     const rect = canvas.getBoundingClientRect();
     const xpos = event.clientX - rect.left;
     const ypos = event.clientY - rect.top;
@@ -228,18 +247,31 @@ function resize() {
     // Pre-condiiton: idxSelectedSquare > -1
     let ratio = document.getElementById("new-size").value / 100;
 
-    // Cari titik dua diagonal square
-    let vertices = listObj[idxSelectedSquare].vertices;
-    let x0 = vertices[0], y0 = vertices[1],
-        x1 = vertices[6], y1 = vertices[7];
+    if(listObj[idxSelected].jenis == "square") {
+        // Cari titik dua diagonal square
+        let vertices = listObj[idxSelected].vertices;
+        let x0 = vertices[0], y0 = vertices[1],
+            x1 = vertices[6], y1 = vertices[7];
 
-    listObj[idxSelectedSquare].vertices = [];
-    listObj[idxSelectedSquare].vertices.push(
-        x0, y0, 0.0,
-        x0, y0 + ratio * (y1 - y0), 0.0,
-        x0 + ratio * (x1 - x0), y0 + ratio * (y1 - y0), 0.0,
-        x0 + ratio * (x1 - x0), y0, 0.0
-    )
+        listObj[idxSelected].vertices = [];
+        listObj[idxSelected].vertices.push(
+            x0, y0, 0.0,
+            x0, y0 + ratio * (y1 - y0), 0.0,
+            x0 + ratio * (x1 - x0), y0 + ratio * (y1 - y0), 0.0,
+            x0 + ratio * (x1 - x0), y0, 0.0
+        )
+
+    } else { // resize line
+        let vertices = listObj[idxSelected].vertices;
+        let x0 = vertices[0], y0 = vertices[1],
+            x1 = vertices[3], y1 = vertices[4];
+        
+        listObj[idxSelected].vertices = []; // New value
+        listObj[idxSelected].vertices.push(
+            x0, y0, 0.0,
+            x0 + ratio * (x1 - x0), y0 + ratio * (y1 - y0), 0.0
+        )   
+    }
 
     render(gl, listObj);
     document.getElementById("new-size").value = 100; // Returns slider position to default
@@ -269,8 +301,31 @@ function findNearestObj(listObj, x, y) {
 }
 
 function eucDist(x, y, pos) {
+    // Calculates distance between two points
     return Math.pow(
         Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2),
         0.5
     )
+}
+
+var isHelp = false;
+function displayHelp() {
+    let help = document.getElementById("help");
+    if (!isHelp) {
+        help.innerHTML = `
+        <h3> Klik tombol "Change Mode" setiap ada perubahan setting yang dilakukan </h3>
+        <p>1. Drawing: Pilih menu "drawing" dan di sampingnya pilih model yang ingin digambar. <br>
+        Khusus untuk polygon, pilih jumlah sisi yang diinginkan pada input jumlah sisi.</p> 
+        <p>2. Change Size: Pilih menu "change size" dan tombol "Change Mode". <br>
+        Klik model <b>square atau line</b> yang ingin diubah ukurannya<br>
+        lalu geser slider ke kanan untuk memperbesar, dan kiri untuk memperkecil.<br></p>
+        <p>3. Change Color: Pilih menu "change color", pilih warna yang diinginkan di menu dropdown ke tiga. Lalu, klik tombol "Change Mode". <br>
+        Klik model pada canvas yang ingin diubah warnanya<br></p>
+        <p>4. Move point: Pilih menu "move point" dan klik tombol "Change Mode". <br>
+        Klik salah satu titik simpul pada model yang ingin diubah posisinya, lalu geser sesuai lokasi yang diinginkan, lalu klik lagi.<br></p>
+        `;
+    } else {
+        help.innerHTML = "";
+    }
+    isHelp = !isHelp;
 }
