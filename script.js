@@ -36,7 +36,7 @@ function processInput() {
 }
 
 function processDataFromFile() {
-    console.log(data);
+    // console.log(data);
     for (var i = 0; i < data.length; ++i) {
         listObj.push(new Obj(data[i].jenis, data[i].jumlahSisi, data[i].vertices, data[i].color));
     }
@@ -51,7 +51,7 @@ function selectSquare(x, y) {
             let temp = obj.vertices;
             let x0 = temp[0], y0 = temp[1],
                 x1 = temp[6], y1 = temp[7];
-            console.log(x0 + "," + x1 + "  " + y0 + "," + y1);
+            // console.log(x0 + "," + x1 + "  " + y0 + "," + y1);
 
             if (x >= Math.min(x1, x0) && x <= Math.max(x1, x0)
                 && y >= Math.min(y1, y0) && y <= Math.max(y1, y0)) {
@@ -68,6 +68,8 @@ window.onload = function init() {
 
     var slider = document.getElementById("new-size");
     var canvas = document.getElementById('my_Canvas');
+    var clicked = false; var selectedObjIdx = 0, nearestIdx = 0;
+
     canvas.style.width = "1024px";
     canvas.style.height = "570px";
 
@@ -142,6 +144,69 @@ window.onload = function init() {
             let pos = getCursorPosition(event, canvas);
             changeColor(canvas, pos, listObj);
             render(gl, listObj);
+            clicked = false;
+        }
+        else if (menu == "move-point") {
+            
+            if(clicked) {
+                let pos = getCursorPosition(event, canvas);
+                listObj[selectedObjIdx].vertices[nearestIdx] = pos.x;
+                listObj[selectedObjIdx].vertices[nearestIdx + 1] = pos.y;
+                render(gl, listObj);
+                clicked = false;
+            } else {
+                // pilih vertexnya dulu
+                let pos = getCursorPosition(event, canvas);
+                let idx = findNearestObj(listObj, pos.x, pos.y);
+                let vert = listObj[idx].vertices;
+                selectedObjIdx = idx;
+                let minDist = 2;
+                
+                for(let i = 0; i < vert.length; i+=3) {
+                    let tempDist = Math.min(minDist, eucDist(vert[i], vert[i+1], pos));
+                    if (minDist > tempDist) {
+                        minDist = Math.min(minDist, eucDist(vert[i], vert[i+1], pos));
+                        nearestIdx = i;
+                    }
+                }
+
+                clicked = true;
+            }
+            
+        }
+    });
+
+    canvas.addEventListener('mousemove', function(event) {
+        if(clicked) {
+            let pos = getCursorPosition(event, canvas);
+            listObj[selectedObjIdx].vertices[nearestIdx] = pos.x;
+            listObj[selectedObjIdx].vertices[nearestIdx + 1] = pos.y;
+
+            if (listObj[selectedObjIdx].jenis == "square") {
+                // nearestIdx can only be: 0, 3, 6, 9
+                let vert = listObj[selectedObjIdx].vertices;
+                switch(nearestIdx) {
+                    case 0:
+                        vert[3] = pos.x; vert[4] = vert[7];
+                        vert[9] = vert[6]; vert[10] = pos.y; 
+                        break;
+                    case 3:
+                        console.log(3);
+                        vert[0] = pos.x; vert[1] = vert[10];
+                        vert[6] = vert[9]; vert[7] = pos.y;
+                        break;
+                    case 6:
+                        vert[3] = pos.x; vert[4] = vert[1];
+                        vert[9] = vert[0]; vert[10] = pos.y; 
+                        break;
+                    case 9:
+                        console.log(9);
+                        vert[0] = pos.x; vert[1] = vert[4];
+                        vert[6] = vert[3]; vert[7] = pos.y;
+                        break;
+                }
+            }
+            render(gl, listObj);
         }
     });
 }
@@ -192,7 +257,7 @@ function findNearestObj(listObj, x, y) {
     for (var i = 0; i < listObj.length; ++i) {
         let obj = listObj[i];
         for (var j = 0; j < obj.jumlahSisi; j += 3) {
-            // calculate distance
+            // Calculate distance
             let dist = Math.pow(Math.pow(obj.vertices[j] - x, 2) + Math.pow(obj.vertices[j + 1] - y, 2), 0.5);
             if (dist < nearestDistance) {
                 nearestDistance = dist;
@@ -201,4 +266,11 @@ function findNearestObj(listObj, x, y) {
         }
     }
     return idxNearestObj;
+}
+
+function eucDist(x, y, pos) {
+    return Math.pow(
+        Math.pow(pos.x - x, 2) + Math.pow(pos.y - y, 2),
+        0.5
+    )
 }
