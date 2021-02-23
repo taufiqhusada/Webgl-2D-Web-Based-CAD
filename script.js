@@ -180,6 +180,31 @@ window.onload = function init() {
             let pos = getCursorPosition(event, canvas);
             listObj[selectedObjIdx].vertices[nearestIdx] = pos.x;
             listObj[selectedObjIdx].vertices[nearestIdx + 1] = pos.y;
+
+            if (listObj[selectedObjIdx].jenis == "square") {
+                // nearestIdx can only be: 0, 3, 6, 9
+                let vert = listObj[selectedObjIdx].vertices;
+                switch(nearestIdx) {
+                    case 0:
+                        vert[3] = pos.x; vert[4] = vert[7];
+                        vert[9] = vert[6]; vert[10] = pos.y; 
+                        break;
+                    case 3:
+                        console.log(3);
+                        vert[0] = pos.x; vert[1] = vert[10];
+                        vert[6] = vert[9]; vert[7] = pos.y;
+                        break;
+                    case 6:
+                        vert[3] = pos.x; vert[4] = vert[1];
+                        vert[9] = vert[0]; vert[10] = pos.y; 
+                        break;
+                    case 9:
+                        console.log(9);
+                        vert[0] = pos.x; vert[1] = vert[4];
+                        vert[6] = vert[3]; vert[7] = pos.y;
+                        break;
+                }
+            }
             render(gl, listObj);
         }
     });
@@ -231,7 +256,7 @@ function findNearestObj(listObj, x, y) {
     for (var i = 0; i < listObj.length; ++i) {
         let obj = listObj[i];
         for (var j = 0; j < obj.jumlahSisi; j += 3) {
-            // calculate distance
+            // Calculate distance
             let dist = Math.pow(Math.pow(obj.vertices[j] - x, 2) + Math.pow(obj.vertices[j + 1] - y, 2), 0.5);
             if (dist < nearestDistance) {
                 nearestDistance = dist;
