@@ -1,3 +1,6 @@
+// File : common.js
+// Author : Kelompok 9 - K1
+
 const dictColorVectors = {
     "black": [0.0, 0.0, 0.0],
     "red": [1.0, 0.0, 0.0],

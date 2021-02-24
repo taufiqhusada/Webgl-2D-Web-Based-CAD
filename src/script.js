@@ -1,3 +1,6 @@
+// File : script.js
+// Author : Kelompok 9 - K1
+
 var cntMouseClicked = 0;
 
 function Obj(jenis, jumlahSisi, vertices, color) {
